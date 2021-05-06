@@ -1,0 +1,104 @@
+IF  EXISTS (SELECT name FROM sys.databases WHERE name = N'ApressFinancial')
+DROP DATABASE [ApressFinancial]
+GO
+CREATE DATABASE ApressFinancial 
+GO
+USE [ApressFinancial]
+GO
+CREATE SCHEMA [TransactionDetails] AUTHORIZATION dbo
+GO
+CREATE SCHEMA [ShareDetails] AUTHORIZATION dbo
+GO
+CREATE SCHEMA [CustomerDetails] AUTHORIZATION dbo
+
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [CustomerDetails].[Customers](
+	[CustomerId] [bigint] IDENTITY(1,1) NOT NULL,
+	[CustomerTitleId] [int] NOT NULL,
+	[CustomerFirstName] [nvarchar](50) NOT NULL,
+	[CustomerOtherInitials] [nvarchar](50) NULL,
+	[CustomerLastName] [nvarchar](50) NOT NULL,
+	[AddressId] [bigint] NOT NULL,
+	[AccountNumber] [nvarchar](15) NOT NULL,
+	[AccountTypeId] [int] NOT NULL,
+	[ClearedBalance] [money] NOT NULL,
+	[UnclearedBalance] [money] NOT NULL,
+	[DateAddedd] [datetime] NULL,
+ CONSTRAINT [PK_Customers] PRIMARY KEY NONCLUSTERED 
+(
+	[CustomerId] ASC
+)WITH (IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [CustomerDetails].[CustomerProducts](
+	[CustomerFinancialProductId] [bigint] NOT NULL,
+	[CustomerId] [bigint] NOT NULL,
+	[FinancialProductId] [bigint] NOT NULL,
+	[AmountToCollect] [money] NOT NULL,
+	[Frequency] [smallint] NOT NULL,
+	[LastCollected] [datetime] NOT NULL,
+	[LastCollection] [datetime] NOT NULL,
+	[Renewable] [bit] NOT NULL,
+ CONSTRAINT [PK_CustomerProducts] PRIMARY KEY CLUSTERED 
+(
+	[CustomerFinancialProductId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [CustomerDetails].[CustomerProducts]  WITH CHECK ADD  CONSTRAINT [FK_Customers_CustomerProducts] FOREIGN KEY(CustomerId)
+REFERENCES [CustomerDetails].[Customers](CustomerId)
+GO
+CREATE TABLE TransactionDetails.Transactions
+(TransactionId bigint IDENTITY(1,1) NOT NULL,
+CustomerId bigint NOT NULL,
+TransactionType int NOT NULL,
+DateEntered datetime NOT NULL,
+Amount numeric(18, 5) NOT NULL,
+ReferenceDetails nvarchar(50) NULL,
+Notes nvarchar(max) NULL,
+RelatedShareId bigint NULL,
+RelatedProductId bigint NOT NULL)
+USE ApressFinancial
+GO
+IF OBJECT_ID('TransactionDetails.TransactionTypes', 'U') IS NOT NULL
+DROP TABLE TransactionDetails.TransactionTypes
+GO
+CREATE TABLE TransactionDetails.TransactionTypes(
+TransactionTypeId int IDENTITY(1,1) NOT NULL,
+TransactionDescription nvarchar(30) NOT NULL,
+CreditType bit NOT NULL
+)
+GO
+ALTER TABLE TransactionDetails.TransactionTypes
+ADD AffectCashBalance bit NULL
+GO
+CREATE TABLE CustomerDetails.FinancialProducts(
+ProductId bigint NOT NULL,
+ProductName nvarchar(50) NOT NULL
+) ON [PRIMARY]
+GO
+CREATE TABLE ShareDetails.SharePrices(
+SharePriceId bigint IDENTITY(1,1) NOT NULL,
+ShareId bigint NOT NULL,
+Price numeric(18, 5) NOT NULL,
+PriceDate datetime NOT NULL
+) ON [PRIMARY]
+GO
+CREATE TABLE ShareDetails.Shares(
+ShareId bigint IDENTITY(1,1) NOT NULL,
+ShareDesc nvarchar(50) NOT NULL,
+ShareTickerId nvarchar(50) NULL,
+CurrentPrice numeric(18, 5) NOT NULL
+) ON [PRIMARY]
+GO
+
+

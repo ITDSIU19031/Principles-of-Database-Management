@@ -1,0 +1,49 @@
+CREATE DATABASE Employee
+CREATE TABLE employee(
+	employeename VARCHAR(50),
+	street VARCHAR(20),
+	city VARCHAR(20)
+)
+CREATE TABLE works(
+	employeename VARCHAR(50),
+	companyname VARCHAR(50),
+	salary INT
+)
+CREATE TABLE company(
+	companyname VARCHAR(50),
+	city VARCHAR(10)
+)
+CREATE TABLE manages(
+	employeename VARCHAR(50),
+	managername VARCHAR(50)
+)
+
+ALTER TABLE employee 
+ALTER COLUMN employeename VARCHAR NOT NULL ;
+ALTER TABLE employee 
+ADD PRIMARY KEY( employeename);
+
+ALTER TABLE works
+ALTER COLUMN employeename VARCHAR NOT NULL;
+ALTER TABLE works
+ADD PRIMARY KEY(employeename);
+
+ALTER TABLE company
+ALTER COLUMN companyname VARCHAR NOT NULL;
+ALTER TABLE company
+ADD PRIMARY KEY(companyname);
+
+ALTER TABLE manages
+ALTER COLUMN employeename VARCHAR NOT NULL;
+ALTER TABLE manages
+ADD PRIMARY KEY(employeename);
+
+ALTER TABLE manages
+ADD FOREIGN KEY (employeename) REFERENCES manages(employeename);
+
+INSERT INTO employee(employeename, street, city )
+VALUES ('Toan', 'Vo Chi Cong', 'Quy Nhon'),
+		('Trung', 'Le Van Viet', 'Tay Ninh'),
+		('Anh', 'Cong Hoa', 'Ho Chi Minh'),
+		('Thong', 'Hoang Van Thu', 'Gia Lai'),
+		('Thinh', 'Le Van Si', 'Ben Tre');
